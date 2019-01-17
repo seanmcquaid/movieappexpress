@@ -26,4 +26,20 @@ router.get('/', function(req, res, next) {
   })
 });
 
+// make a new route called /search
+// if the user comes to it, render search.ejs
+
+router.get("/search", function(req, res, next){
+  res.render("search",{
+    title: "search!",
+  })
+});
+
+router.post("/search/movie", (req,res,next)=>{
+  // submitted data from forms comes in the req object
+  // query string data is in req.query
+  // posted data is in req.body
+  res.json(req.body);
+})
+
 module.exports = router;

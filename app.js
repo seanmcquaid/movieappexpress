@@ -9,6 +9,17 @@ var usersRouter = require('./routes/users');
 
 var app = express();
 
+// write some middleware that gets the users ip and saves it so the view can see it 
+// we write application level middleware with app.use
+// app level middle ware = a function with req and res that runs 
+// every single request
+app.use((req,res, next)=>{
+  const userIp = req.ip;
+  res.locals.ip = userIp;
+  console.log(userIp);
+  next();
+});
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
