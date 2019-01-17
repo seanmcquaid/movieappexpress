@@ -39,7 +39,16 @@ router.post("/search/movie", (req,res,next)=>{
   // submitted data from forms comes in the req object
   // query string data is in req.query
   // posted data is in req.body
-  res.json(req.body);
-})
+  // res.json(req.body);
+  const movieTitle = req.body.movieTitle;
+  const searchURL = `${apiBaseUrl}/search/movie?query=${movieTitle}&api_key=${apiKey}`;
+  request.get(searchURL, (error,response,body)=>{
+    const parsedData = JSON.parse(body);
+    res.render("now_playing",{
+      imageBaseUrl,
+      parsedData : parsedData.results,
+    });
+  });
+});
 
 module.exports = router;
