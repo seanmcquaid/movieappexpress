@@ -1,11 +1,15 @@
 var express = require('express');
 var router = express.Router();
+const mysql = require("mysql");
+const config = require("../config");
+const connection = mysql.createConnection(config.db);
+connection.connect();
+const bcrypt = require("bcrypt-nodejs");
 // dont need to include.js because node assumes that this is a js file
 // our node module, its in gitignore
-const apiKey = require("../config")
 const apiBaseUrl = "http://api.themoviedb.org/3";
 const imageBaseUrl = "http://image.tmdb.org/t/p/w300";
-const nowPlayingUrl = `${apiBaseUrl}/movie/now_playing?api_key=${apiKey}`;
+const nowPlayingUrl = `${apiBaseUrl}/movie/now_playing?api_key=${config.apiKey}`;
 
 // $.getJSON(url,(data)=>{}) becomes
 const request = require("request");
@@ -41,7 +45,7 @@ router.post("/search/movie", (req,res,next)=>{
   // posted data is in req.body
   // res.json(req.body);
   const movieTitle = req.body.movieTitle;
-  const searchURL = `${apiBaseUrl}/search/movie?query=${movieTitle}&api_key=${apiKey}`;
+  const searchURL = `${apiBaseUrl}/search/movie?query=${movieTitle}&api_key=${config.apiKey}`;
   request.get(searchURL, (error,response,body)=>{
     const parsedData = JSON.parse(body);
     res.render("now_playing",{
@@ -50,5 +54,24 @@ router.post("/search/movie", (req,res,next)=>{
     });
   });
 });
+
+router.get("/login", (req,res,next)=>{
+  res.render("login");
+})
+
+router.post("/loginProcess", (req,res,next)=>{
+  const insertQuery = ` INSERT into users (email,password)
+  VALUES
+  (?,?);`;
+  // res.json(req.body);
+  connection.query(insertQuery, [req.body.email, x], (error, results)=>{
+    const x = bcrypt.hashSync(x);
+    if(error){
+      throw error
+    } else{
+      res.json("success");
+    }
+  })
+})
 
 module.exports = router;
